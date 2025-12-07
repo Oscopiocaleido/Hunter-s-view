@@ -198,6 +198,46 @@ void optimizacion_mates2(int idx, int M, int T, Circulo lista[], int suma_actual
     optimizacion_mates2(idx + 1, M, T, lista, suma_actual, cant_actual, oscuridad_actual);
 }
 
+void archivo_de_salida(file_pgm &img, Circulo lista[], int M){
+    ofstream salida("sites.pgm");
+
+    salida<< "P2" <<endl;
+    salida<< img.alto << " " << img.ancho <<endl;
+    salida<< img.valor_max <<endl;
+
+    int m_salida [256][256];
+    for(int i = 0; i < img.alto; i++){
+        for(int j = 0; j < img.ancho; j++){
+            m_salida[i][j] = 0;
+        }
+    }
+
+    for(int k = 0; k < M; k++){
+        m_salida[lista[k].centro_fila][lista[k].centro_col] = img.valor_max;
+
+        for(int i = lista[k].min_fila; i <= lista[k].max_fila; i++){
+            for(int j = lista[k].min_col; j <= lista[k].max_col; j++){
+                if(img.pixeles[i][j] == lista[k].color){
+                    if(i == 0 || i == img.alto - 1 || j == 0 || j == img.ancho - 1 ||
+                        img.pixeles[i-1][j] != lista[k].color || img.pixeles[i+1][j] != lista[k].color ||
+                        img.pixeles[i][j-1] != lista[k].color || img.pixeles[i][j+1] != lista[k].color ){
+
+                            m_salida[i][j] = lista[k].color;
+                    }
+                }
+            }
+        }
+    }
+
+    for(int i = 0; i < img.alto; i++){
+        for(int j = 0; j < img.ancho; j++){
+            salida<< m_salida[i][j] << " ";
+        }
+        salida<<endl;
+    }
+    salida.close();
+}
+
 int main() {
     int N = 0, M = 0, T = 0;
     file_pgm img;
@@ -228,5 +268,6 @@ int main() {
     }
     cout<<endl;
 
+    archivo_de_salida(img, circulos, M);
     return 0;
 }
